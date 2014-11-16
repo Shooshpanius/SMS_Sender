@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
                         // Добавим данные (пара - "название - значение")
                         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
                         nameValuePairs.add(new BasicNameValuePair("login", mSettings.getString(APP_PREFERENCES_LOGIN, "")));
-                        nameValuePairs.add(new BasicNameValuePair("pwd", getHash(mSettings.getString(APP_PREFERENCES_PASSWORD, "").getBytes())));
+                        nameValuePairs.add(new BasicNameValuePair("pwd", MD5(mSettings.getString(APP_PREFERENCES_PASSWORD, ""))));
                         httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
                         // Выполним запрос
@@ -178,7 +178,19 @@ public class MainActivity extends Activity {
     }
 
 
-
+    public String MD5(String md5) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(md5.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < array.length; ++i) {
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+            }
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+        }
+        return null;
+    }
 
 
 
