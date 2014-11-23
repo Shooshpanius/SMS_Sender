@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +44,9 @@ public class MainActivity extends Activity {
     public static final String APP_PREFERENCES_PASSWORD = "password";
     SharedPreferences mSettings;
     final String LOG_TAG = "myLogs";
+    public String[] sms_arr_str;
+
+    SmsManager smsManager = SmsManager.getDefault();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +94,8 @@ public class MainActivity extends Activity {
                                         JSONObject responseJSON = new JSONObject(responseBody);
                                         final JSONArray sms_arr = responseJSON.getJSONArray("sys");
 
-                                        final String[] sms_arr_str = new String[sms_arr.length()];
+
+                                        sms_arr_str = new String[sms_arr.length()];
 
                                         final ListView smsList = (ListView)findViewById(R.id.smsList);
 
@@ -103,38 +108,52 @@ public class MainActivity extends Activity {
 
                                         }
 
-                                    final ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
-                                    smsList.setAdapter(adapter);
+                                        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
+                                        smsList.setAdapter(adapter);
 
                                         smsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         public void onItemClick(AdapterView<?> parent, View view,
-                                                                int position, long id) {
-                                            Log.d(LOG_TAG, "itemClick: position = " + position + ", id = "
-                                                    + id);
+                                            int position, long id) {
+                                                Log.d(LOG_TAG, "itemClick: position = " + position + ", id = "
+                                                        + id);
 
-                                            try {
-                                                JSONObject sms = sms_arr.getJSONObject(position);
-                                                Log.d(LOG_TAG, "text = " + sms.getString("text") + ", id = "
-                                                        + sms.getString("phone"));
+                                                try {
+                                                    JSONObject sms = sms_arr.getJSONObject(position);
+//                                                    Log.d(LOG_TAG, "text = " + sms.getString("text") + ", id = "
+//                                                            + sms.getString("phone"));
+
+                                                    String text_sms = sms.getString("text");
+//                                                    String text_sms = "фыва";
+                                                    String number_sms = "+7"+sms.getString("phone");
+
+//                                                    PendingIntent sentPI;
+//                                                    String SENT = "SMS_SENT";
+//                                                    sentPI = PendingIntent.getBroadcast(MainActivity.this, 0,new Intent(SENT), 0);
+
+                                                    ArrayList smsContructedList = smsManager.divideMessage(text_sms);
+
+                                                    smsManager.sendMultipartTextMessage(number_sms, null, smsContructedList, null, null);
+                                                    Log.d(LOG_TAG, "text = " + text_sms + ", id = " + number_sms);
 
 
-                                                Object[] sms_arr_str_r = ArrayUtils.remove(sms_arr_str, position);
+                                                    sms_arr_str = (String[]) ArrayUtils.remove(sms_arr_str, position);
 
-                                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, (String[]) sms_arr_str_r);
-                                                smsList.setAdapter(adapter);
+                                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, (String[]) sms_arr_str);
+                                                    smsList.setAdapter(adapter);
 
-                                                adapter.notifyDataSetChanged();
-                                                adapter.notifyDataSetInvalidated();
-
-
+                                                    adapter.notifyDataSetChanged();
+                                                    adapter.notifyDataSetInvalidated();
 
 
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
+
+
+
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+
                                             }
-
-                                        }
-                                    });
+                                        });
 
 //                                        debugText.setText(sms_arr.length());
                                     } catch (JSONException e) {
