@@ -10,13 +10,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -37,13 +36,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class MainActivity extends Activity {
 
     public static final String APP_PREFERENCES = "sms_settings";
     public static final String APP_PREFERENCES_LOGIN = "login";
     public static final String APP_PREFERENCES_PASSWORD = "password";
     SharedPreferences mSettings;
+    final String LOG_TAG = "myLogs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,22 +88,53 @@ public class MainActivity extends Activity {
 
                                     try {
                                         JSONObject responseJSON = new JSONObject(responseBody);
-                                        JSONArray sms_arr = responseJSON.getJSONArray("sys");
+                                        final JSONArray sms_arr = responseJSON.getJSONArray("sys");
 
-                                        String[] sms_arr_str = new String[sms_arr.length()];
+                                        final String[] sms_arr_str = new String[sms_arr.length()];
 
-                                        ListView smsList = (ListView)findViewById(R.id.smsList);
+                                        final ListView smsList = (ListView)findViewById(R.id.smsList);
 
                                         for (int i = 0; i < sms_arr.length(); i++) {
-                                            JSONObject sms = sms_arr.getJSONObject(i);
+                                           JSONObject sms = sms_arr.getJSONObject(i);
                                            String id = sms.getString("text");
 //                                            debugText.setText(id);
                                             sms_arr_str[i] = id;
 
 
                                         }
-                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
-                                        smsList.setAdapter(adapter);
+
+                                    final ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
+                                    smsList.setAdapter(adapter);
+
+                                        smsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                        public void onItemClick(AdapterView<?> parent, View view,
+                                                                int position, long id) {
+                                            Log.d(LOG_TAG, "itemClick: position = " + position + ", id = "
+                                                    + id);
+
+                                            try {
+                                                JSONObject sms = sms_arr.getJSONObject(position);
+                                                Log.d(LOG_TAG, "text = " + sms.getString("text") + ", id = "
+                                                        + sms.getString("phone"));
+
+
+                                                Object[] sms_arr_str_r = ArrayUtils.remove(sms_arr_str, position);
+
+                                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, (String[]) sms_arr_str_r);
+                                                smsList.setAdapter(adapter);
+
+                                                adapter.notifyDataSetChanged();
+                                                adapter.notifyDataSetInvalidated();
+
+
+
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    });
 
 //                                        debugText.setText(sms_arr.length());
                                     } catch (JSONException e) {
@@ -191,7 +221,6 @@ public class MainActivity extends Activity {
         }
         return null;
     }
-
 
 
 

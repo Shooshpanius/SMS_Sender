@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="C:\Users\Shoo\AndroidStudioProjects\SMSSender\app\build\intermediates\pre-dexed\debug\commons-lang-2.3-465fcc38af73100a8c66aee2bd6a5506c0049b2c.jar"
+        jar="C:\Users\Shoo\AndroidStudioProjects\SMSSender\app\libs\commons-lang-2.3.jar"
+        jumboMode="false"
+        revision="21.0.1"
+        sha1="0eecdac8c86bc84b4bdfc24371ba8c785a1fc552"/>
+
+</pre-dex-items>
