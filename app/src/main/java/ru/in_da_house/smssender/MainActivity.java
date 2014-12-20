@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ListView;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -37,11 +37,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.OnLongClickListener;
+
 public class MainActivity extends Activity {
 
     public static final String APP_PREFERENCES = "sms_settings";
     public static final String APP_PREFERENCES_LOGIN = "login";
     public static final String APP_PREFERENCES_PASSWORD = "password";
+    public static final String APP_PREFERENCES_CNT1 = "cnt1";
+    public static final String APP_PREFERENCES_CNT2 = "cnt2";
     SharedPreferences mSettings;
     final String LOG_TAG = "myLogs";
     public String[] sms_arr_str;
@@ -54,14 +58,39 @@ public class MainActivity extends Activity {
 
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 
+
         if(!mSettings.contains(APP_PREFERENCES_LOGIN) || !mSettings.contains(APP_PREFERENCES_PASSWORD)) {
             setContentView(R.layout.need_settings);
         } else {
             setContentView(R.layout.activity_main);
 
-            ImageButton buttonGetData = (ImageButton)findViewById(R.id.getData);
+
+
+
+            Button btnCnt1 = (Button)findViewById(R.id.btnCnt1);
+            if(mSettings.contains(APP_PREFERENCES_CNT1)) {
+                btnCnt1.setText(mSettings.getString(APP_PREFERENCES_CNT1, ""));
+            }
+            else
+            {
+                btnCnt1.setText(mSettings.getString("0", ""));
+            }
+
+            Button btnCnt2 = (Button)findViewById(R.id.btnCnt2);
+            if(mSettings.contains(APP_PREFERENCES_CNT2)) {
+                btnCnt2.setText(mSettings.getString(APP_PREFERENCES_CNT2, ""));
+            }
+            else
+            {
+                btnCnt2.setText(mSettings.getString("0", ""));
+            }
+
+
+
+
+            Button buttonGetData = (Button)findViewById(R.id.getDataBtn);
             buttonGetData.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
+                    public void onClick(View v) {
 
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                             .permitAll().build();
@@ -111,8 +140,8 @@ public class MainActivity extends Activity {
                                         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
                                         smsList.setAdapter(adapter);
 
-                                        smsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                        public void onItemClick(AdapterView<?> parent, View view,
+                                        smsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                        public boolean onItemLongClick(AdapterView<?> parent, View view,
                                             int position, long id) {
                                                 Log.d(LOG_TAG, "itemClick: position = " + position + ", id = "
                                                         + id);
@@ -132,8 +161,47 @@ public class MainActivity extends Activity {
 
                                                     ArrayList smsContructedList = smsManager.divideMessage(text_sms);
 
-                                                    smsManager.sendMultipartTextMessage(number_sms, null, smsContructedList, null, null);
+//                                                    smsManager.sendMultipartTextMessage(number_sms, null, smsContructedList, null, null);
                                                     Log.d(LOG_TAG, "text = " + text_sms + ", id = " + number_sms);
+
+
+
+
+                                                    if(mSettings.contains(APP_PREFERENCES_CNT1)) {
+                                                        int cnt1 = Integer.parseInt(mSettings.getString(APP_PREFERENCES_CNT1, "")) + 1;
+                                                        SharedPreferences.Editor editor = mSettings.edit();
+                                                        editor.putString(APP_PREFERENCES_CNT1, Integer.toString(cnt1)  );
+                                                        editor.commit();
+                                                        Button btnCnt1 = (Button)findViewById(R.id.btnCnt1);
+                                                        btnCnt1.setText(mSettings.getString(APP_PREFERENCES_CNT1, ""));
+                                                    }
+                                                    else
+                                                    {
+                                                        SharedPreferences.Editor editor = mSettings.edit();
+                                                        editor.putString(APP_PREFERENCES_CNT1, Integer.toString(1)  );
+                                                        editor.commit();
+                                                        Button btnCnt1 = (Button)findViewById(R.id.btnCnt1);
+                                                        btnCnt1.setText(mSettings.getString(APP_PREFERENCES_CNT1, ""));
+                                                    }
+
+                                                    if(mSettings.contains(APP_PREFERENCES_CNT2)) {
+                                                        int cnt2 = Integer.parseInt(mSettings.getString(APP_PREFERENCES_CNT2, "")) + 1;
+                                                        SharedPreferences.Editor editor = mSettings.edit();
+                                                        editor.putString(APP_PREFERENCES_CNT2, Integer.toString(cnt2)  );
+                                                        editor.commit();
+                                                        Button btnCnt2 = (Button)findViewById(R.id.btnCnt2);
+                                                        btnCnt2.setText(mSettings.getString(APP_PREFERENCES_CNT2, ""));
+                                                    }
+                                                    else
+                                                    {
+                                                        SharedPreferences.Editor editor = mSettings.edit();
+                                                        editor.putString(APP_PREFERENCES_CNT2, Integer.toString(1)  );
+                                                        editor.commit();
+                                                        Button btnCnt2 = (Button)findViewById(R.id.btnCnt2);
+                                                        btnCnt2.setText(mSettings.getString(APP_PREFERENCES_CNT2, ""));
+                                                    }
+
+
 
 
                                                     sms_arr_str = (String[]) ArrayUtils.remove(sms_arr_str, position);
@@ -151,7 +219,7 @@ public class MainActivity extends Activity {
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
-
+                                            return false;
                                             }
                                         });
 
@@ -177,7 +245,53 @@ public class MainActivity extends Activity {
                 }
             });
 
+//            Button btnCnt1 = (Button)findViewById(R.id.btnCnt1);
+            btnCnt1.setOnLongClickListener(new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
 
+                    if(mSettings.contains(APP_PREFERENCES_CNT1)) {
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(APP_PREFERENCES_CNT1, Integer.toString(0)  );
+                        editor.commit();
+                        Button btnCnt1 = (Button)findViewById(R.id.btnCnt1);
+                        btnCnt1.setText(mSettings.getString(APP_PREFERENCES_CNT1, ""));
+                    }
+                    else
+                    {
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(APP_PREFERENCES_CNT1, Integer.toString(0)  );
+                        editor.commit();
+                        Button btnCnt1 = (Button)findViewById(R.id.btnCnt1);
+                        btnCnt1.setText(mSettings.getString(APP_PREFERENCES_CNT1, ""));
+                    }
+                    return false;
+                }
+            });
+
+//            Button btnCnt2 = (Button)findViewById(R.id.btnCnt2);
+            btnCnt2.setOnLongClickListener(new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    if(mSettings.contains(APP_PREFERENCES_CNT2)) {
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(APP_PREFERENCES_CNT2, Integer.toString(0)  );
+                        editor.commit();
+                        Button btnCnt2 = (Button)findViewById(R.id.btnCnt2);
+                        btnCnt2.setText(mSettings.getString(APP_PREFERENCES_CNT2, ""));
+                    }
+                    else
+                    {
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(APP_PREFERENCES_CNT2, Integer.toString(0)  );
+                        editor.commit();
+                        Button btnCnt2 = (Button)findViewById(R.id.btnCnt2);
+                        btnCnt2.setText(mSettings.getString(APP_PREFERENCES_CNT2, ""));
+                    }
+                    return false;
+                }
+            });
 
 
         }

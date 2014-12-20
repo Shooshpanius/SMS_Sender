@@ -18,19 +18,44 @@
     <GridLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:rowCount="1"
+        android:columnCount="9"
+        android:id="@+id/gridLayout1">
 
-        <ImageButton
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/getData"
-            android:src="@android:drawable/stat_sys_download_done" />
+            android:id="@+id/getDataBtn"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:width="100dp"
+            android:text="rsv" />
 
-        <ImageButton
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/sendData"
-            android:src="@android:drawable/stat_sys_upload_done" />
+            android:id="@+id/sendDataBtn"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:width="100dp"
+            android:text="send" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnCnt1"
+            android:layout_row="0"
+            android:layout_column="7"
+            android:width="100dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnCnt2"
+            android:layout_row="0"
+            android:layout_column="8"
+            android:width="100dp" />
 
     </GridLayout>
 
