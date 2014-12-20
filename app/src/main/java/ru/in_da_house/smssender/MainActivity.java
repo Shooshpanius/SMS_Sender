@@ -49,6 +49,9 @@ public class MainActivity extends Activity {
     SharedPreferences mSettings;
     final String LOG_TAG = "myLogs";
     public String[] sms_arr_str;
+    public ArrayAdapter<String> adapter;
+    public JSONArray sms_arr;
+
 
     SmsManager smsManager = SmsManager.getDefault();
 
@@ -121,7 +124,7 @@ public class MainActivity extends Activity {
 
                                     try {
                                         JSONObject responseJSON = new JSONObject(responseBody);
-                                        final JSONArray sms_arr = responseJSON.getJSONArray("sys");
+                                        sms_arr = responseJSON.getJSONArray("sys");
 
 
                                         sms_arr_str = new String[sms_arr.length()];
@@ -137,17 +140,17 @@ public class MainActivity extends Activity {
 
                                         }
 
-                                        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
                                         smsList.setAdapter(adapter);
 
                                         smsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                                         public boolean onItemLongClick(AdapterView<?> parent, View view,
                                             int position, long id) {
                                                 Log.d(LOG_TAG, "itemClick: position = " + position + ", id = "
-                                                        + id);
+                                                        + view.getContext());
 
                                                 try {
-                                                    JSONObject sms = sms_arr.getJSONObject(position);
+                                                    JSONObject sms = sms_arr.getJSONObject((int) id);
 //                                                    Log.d(LOG_TAG, "text = " + sms.getString("text") + ", id = "
 //                                                            + sms.getString("phone"));
 
@@ -161,7 +164,7 @@ public class MainActivity extends Activity {
 
                                                     ArrayList smsContructedList = smsManager.divideMessage(text_sms);
 
-//                                                    smsManager.sendMultipartTextMessage(number_sms, null, smsContructedList, null, null);
+                                                    smsManager.sendMultipartTextMessage(number_sms, null, smsContructedList, null, null);
                                                     Log.d(LOG_TAG, "text = " + text_sms + ", id = " + number_sms);
 
 
@@ -205,12 +208,19 @@ public class MainActivity extends Activity {
 
 
                                                     sms_arr_str = (String[]) ArrayUtils.remove(sms_arr_str, position);
+                                                    sms_arr = RemoveJSONArray(sms_arr, position);
+//                                                    sms_arr.remove(position);
+//                                                    Log.d(LOG_TAG, "sms_arr_str size = " + sms_arr_str.length);
+//                                                    Log.d(LOG_TAG, "sms_arr_str = " + Arrays.asList(sms_arr_str));
 
-                                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, (String[]) sms_arr_str);
-                                                    smsList.setAdapter(adapter);
+                                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, sms_arr_str);
 
                                                     adapter.notifyDataSetChanged();
                                                     adapter.notifyDataSetInvalidated();
+
+                                                    smsList.setAdapter(adapter);
+
+
 
 
 
@@ -219,7 +229,7 @@ public class MainActivity extends Activity {
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
-                                            return false;
+                                            return true;
                                             }
                                         });
 
@@ -355,6 +365,18 @@ public class MainActivity extends Activity {
         return null;
     }
 
+    public static JSONArray RemoveJSONArray( JSONArray jarray,int pos) {
 
+        JSONArray Njarray = new JSONArray();
+        try {
+            for (int i = 0; i < jarray.length(); i++) {
+                if (i != pos)
+                    Njarray.put(jarray.get(i));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Njarray;
+    }
 
 }
